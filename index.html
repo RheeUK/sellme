@@ -167,6 +167,21 @@
             position: relative;
             overflow: hidden;
         }
+        
+        .contact-panel {
+            border-color: #ffd700;
+            box-shadow: 
+                inset 0 0 0 4px #b89800,
+                inset 0 0 0 8px #ffd700,
+                8px 8px 0px rgba(0,0,0,0.5),
+                0 0 30px rgba(255, 215, 0, 0.4);
+            animation: pulse-panel 4s infinite alternate;
+        }
+        
+        @keyframes pulse-panel {
+            0% { box-shadow: inset 0 0 0 4px #b89800, inset 0 0 0 8px #ffd700, 8px 8px 0px rgba(0,0,0,0.5), 0 0 15px rgba(255, 215, 0, 0.2); }
+            100% { box-shadow: inset 0 0 0 4px #b89800, inset 0 0 0 8px #ffd700, 8px 8px 0px rgba(0,0,0,0.5), 0 0 40px rgba(255, 215, 0, 0.8); }
+        }
 
         .level-header {
             color: #f8d800; 
@@ -270,6 +285,33 @@
             transform: translate(2px, 2px);
             box-shadow: 2px 2px 0px #e00000;
         }
+        
+        .linkedin-btn {
+            display: inline-block;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #0077b5;
+            color: #ffffff;
+            border: 4px solid #ffffff;
+            padding: 16px 32px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            text-shadow: none;
+            transition: all 0.1s;
+            animation: pulse-btn 2s infinite;
+        }
+        .linkedin-btn:hover {
+            background-color: #00a0dc;
+            transform: translate(-2px, -2px);
+            color: #ffffff;
+        }
+        .linkedin-btn:active {
+            transform: translate(2px, 2px);
+        }
+        @keyframes pulse-btn {
+            0%, 100% { box-shadow: 0 0 10px #0077b5, 4px 4px 0px #000000; }
+            50% { box-shadow: 0 0 25px #00a0dc, 4px 4px 0px #000000; }
+        }
 
         /* Custom retro scrollbar */
         ::-webkit-scrollbar { width: 16px; }
@@ -296,6 +338,7 @@
     <!-- Top HUD / Menu -->
     <div class="top-hud">
         <div class="arcade-title text-sm tracking-widest text-white hidden md:block">SCORE: 198500</div>
+        <div class="arcade-title text-sm tracking-widest text-ring-gold">STAGE: 01</div>
         <div class="arcade-title text-sm tracking-widest text-white hidden md:block">TIME: 13:00</div>
     </div>
 
@@ -544,7 +587,7 @@
         </section>
 
         <!-- SPECIAL STAGE: Certifications -->
-        <section class="retro-panel mb-24" id="panel-zone5">
+        <section class="retro-panel" id="panel-zone5">
             <div class="pixel-curtain" id="curtain-zone5">
                 <div class="pixel-grid" data-zone="zone5"></div>
                 <button class="unlock-btn" onclick="flashDissolve('zone5')">[ UNLOCK SPECIAL STAGE ]</button>
@@ -581,6 +624,22 @@
                     <span>Edexcel GNVQ Intermediate ICT (Leeds College of Technology, 2007)</span>
                 </div>
             </div>
+        </section>
+
+        <!-- FINAL STAGE: Contact -->
+        <section class="retro-panel contact-panel text-center" id="panel-zone6">
+            <div class="pixel-curtain" id="curtain-zone6">
+                <div class="pixel-grid" data-zone="zone6"></div>
+                <button class="unlock-btn" onclick="flashDissolve('zone6')">[ INITIALISE COMMS ]</button>
+            </div>
+            
+            <h2 class="arcade-title text-xl text-ring-gold mb-6" style="text-shadow: 2px 2px 0px #e00000;">FINAL STAGE: TRANSMISSION</h2>
+            
+            <p class="text-gray-100 mb-8 text-lg">Ready to level up your IT operations? Drop me a message on LinkedIn.</p>
+            
+            <a href="https://www.linkedin.com/in/dathan-‍-73a7a7215/" target="_blank" rel="noopener noreferrer" class="linkedin-btn">
+                [ CONNECT ON LINKEDIN ]
+            </a>
         </section>
 
     </div>
