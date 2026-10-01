@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dathan Rhee - Stage 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0000d8;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 32px 32px;
+            font-family: 'VT323', monospace;
+            color: #ffffff;
+            margin: 0;
+            font-size: 1.25rem;
+            line-height: 1.4;
+            overflow-x: hidden;
+            text-shadow: 0 0 4px rgba(255, 255, 255, 0.6), 0 0 10px rgba(80, 144, 255, 0.4);
+        }
+
+        /* --- CRT BRIGHT PHOSPHOR & STRIPE EFFECTS --- */
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.15) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 997;
+        }
+
+        .crt-flicker {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            z-index: 998;
+            pointer-events: none;
+            animation: flicker 0.12s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.01; }
+            50% { opacity: 0.04; }
+            100% { opacity: 0.01; }
+        }
+
+        /* --- SONIC UI STYLING --- */
+        h1, h2, .arcade-title {
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+            line-height: 1.5;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.8), 2px 2px 0px #e00000;
+        }
+
+        .retro-panel {
+            background-color: #000000;
+            border: 4px solid #ffffff;
+            box-shadow: 
+                inset 0 0 0 4px #0050d0,
+                inset 0 0 0 8px #0000a8,
+                8px 8px 0px rgba(0,0,0,0.5),
+                0 0 15px rgba(0, 80, 255, 0.3);
+            padding: 24px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-header {
+            color: #f8d800; 
+            text-shadow: 0 0 8px rgba(248, 216, 0, 0.8), 2px 2px 0px #e00000; 
+            margin-bottom: 24px;
+            font-size: 1.1rem;
+            border-bottom: 4px dashed #f8d800;
+            padding-bottom: 12px;
+        }
+
+        .skill-track {
+            display: flex;
+            gap: 4px;
+            height: 16px;
+            background: #111;
+            padding: 4px;
+            border: 2px solid #777;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+        }
+        .skill-chunk {
+            flex: 1;
+            background-color: #333;
+        }
+        .skill-chunk.filled-gold {
+            background-color: #ffd700;
+            box-shadow: inset -2px -2px 0px #b89800, 0 0 6px rgba(255, 215, 0, 0.6);
+        }
+        .skill-chunk.filled-green {
+            background-color: #00ff00;
+            box-shadow: inset -2px -2px 0px #008800, 0 0 6px rgba(0, 255, 0, 0.6);
+        }
+        .skill-chunk.filled-red {
+            background-color: #ff2020;
+            box-shadow: inset -2px -2px 0px #880000, 0 0 6px rgba(255, 32, 32, 0.6);
+        }
+
+        .text-sonic-blue { color: #60a5ff; text-shadow: 0 0 6px rgba(96, 165, 255, 0.8); }
+        .text-sonic-red { color: #ff6060; text-shadow: 0 0 6px rgba(255, 96, 96, 0.8); }
+        .text-ring-gold { color: #ffd700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.8); }
+        
+        .list-arrow::before {
+            content: "► ";
+            color: #ffd700;
+        }
+
+        .top-hud {
+            background-color: #e00000;
+            border-bottom: 4px solid #ffffff;
+            box-shadow: 0 4px 10px rgba(224, 0, 0, 0.6);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        /* --- HARDWARE PIXEL FLASH SYSTEM --- */
+        .pixel-curtain {
+            position: absolute;
+            inset: 0;
+            background: transparent;
+            z-index: 20;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pixel-grid {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-wrap: wrap;
+            pointer-events: none;
+        }
+
+        .pixel-block {
+            width: 24px;
+            height: 24px;
+            background-color: #0000d8;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            opacity: 1;
+        }
+
+        .unlock-btn {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #f8d800;
+            color: #000000;
+            border: 4px solid #ffffff;
+            padding: 16px 24px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px #e00000;
+            z-index: 30;
+            transition: all 0.1s;
+        }
+        .unlock-btn:hover {
+            background-color: #ffffff;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #e00000;
+        }
+        .unlock-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #e00000;
+        }
+
+        /* Custom retro scrollbar */
+        ::-webkit-scrollbar { width: 16px; }
+        ::-webkit-scrollbar-track { background: #0000d8; border-left: 4px solid #ffffff; }
+        ::-webkit-scrollbar-thumb { background: #ffd700; border: 4px solid #ffffff; box-shadow: 0 0 8px #ffd700; }
+    </style>
+</head>
+<body class="p-0">
+
+    <!-- CRT Bright Overlays -->
+    <div class="crt-overlay"></div>
+    <div class="crt-flicker"></div>
+
+    <!-- Top HUD / Menu -->
+    <div class="top-hud">
+        <div class="arcade-title text-sm tracking-widest text-white hidden md:block">SCORE: 198500</div>
+        <div class="arcade-title text-sm tracking-widest text-ring-gold">TARGET: IT Ops Manager</div>
+        <div class="arcade-title text-sm tracking-widest text-white hidden md:block">TIME: 13:00</div>
+    </div>
+
+    <div class="max-w-5xl mx-auto relative z-10 pt-12 px-6 md:px-12 pb-24">
+        
+        <!-- Header Title Card -->
+        <header class="retro-panel text-center">
+            <h1 class="text-3xl md:text-5xl text-white mb-6">DATHAN</h1>
+            <p class="arcade-title text-sonic-blue text-sm md:text-base mb-4">PLAYER 1: IT SUPPORT MANAGER</p>
+            <div class="flex flex-col md:flex-row justify-center gap-2 md:gap-8 text-xl text-gray-200">
+                <span>ZONE: YORK, UK</span>
+            </div>
+        </header>
+
+        <!-- ZONE 1: Profile -->
+        <section class="retro-panel" id="panel-zone1">
+            <div class="pixel-curtain" id="curtain-zone1">
+                <div class="pixel-grid" data-zone="zone1"></div>
+                <button class="unlock-btn" onclick="flashDissolve('zone1')">[ PRESS START // UNLOCK ZONE 1 ]</button>
+            </div>
+            <h2 class="level-header">ZONE 1: PERSONAL PROFILE</h2>
+            <div class="space-y-4 text-gray-100">
+                <p>I am a pragmatic and delivery-focused IT Support Manager seeking to transition into an IT Operations Manager role. I bring extensive experience in owning the day-to-day delivery of IT services, ensuring the business operates effectively and without disruption.</p>
+                <p>Whilst highly capable of leading technical teams and managing major incidents, I remain fully prepared to be hands-on with technology and directly support operational delivery when required.</p>
+                <p>Having previously aligned IT operations across the UK, US, and mainland Europe, I am adept at bridging the gap between technical strategy, infrastructure health, and personnel management.</p>
+                <p class="text-ring-gold">I am driven by a continuous improvement mindset, using automation and structured workflows to reduce operational noise.</p>
+            </div>
+        </section>
+
+        <!-- ZONE 2: Leadership -->
+        <section class="retro-panel" id="panel-zone2">
+            <div class="pixel-curtain" id="curtain-zone2">
+                <div class="pixel-grid" data-zone="zone2"></div>
+                <button class="unlock-btn" onclick="flashDissolve('zone2')">[ PRESS START // UNLOCK ZONE 2 ]</button>
+            </div>
+            <h2 class="level-header">ZONE 2: LEADERSHIP & COMMERCIAL</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
+                <!-- People Management -->
+                <div>
+                    <h3 class="arcade-title text-[10px] text-sonic-blue mb-4">PEOPLE MANAGEMENT</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Recruitment</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Appraisals</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Staff Coaching</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ITIL -->
+                <div>
+                    <h3 class="arcade-title text-[10px] text-sonic-blue mb-4">ITIL & DELIVERY</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Incident Mgmt</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>SLA Management</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Problem Analysis</span><span class="text-gray-300">4/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commercial -->
+                <div>
+                    <h3 class="arcade-title text-[10px] text-sonic-blue mb-4">COMMERCIAL STRATEGY</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Exec Comms</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Vendor Budget</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-lg mb-1"><span>Client Relations</span><span class="text-ring-gold">5/5</span></div>
+                            <div class="skill-track"><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div><div class="skill-chunk filled-gold"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONE 3: Technical Matrix -->
+        <section class="retro-panel" id="panel-zone3">
+            <div class="pixel-curtain" id="curtain-zone3">
+                <div class="pixel-grid" data-zone="zone3"></div>
+                <button class="unlock-btn" onclick="flashDissolve('zone3')">[ PRESS START // UNLOCK ZONE 3 ]</button>
+            </div>
+            <h2 class="level-header">ZONE 3: TECHNICAL ABILITIES</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-6">
+                
+                <!-- Infrastructure -->
+                <div>
+                    <h3 class="arcade-title text-sm text-white mb-6 bg-sonic-blue inline-block px-2 py-1">IDENTITY & INFRA</h3>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>Entra ID (Azure AD)</span><span class="text-green-300">5/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div></div>
+                        <p class="text-sm text-gray-300">Core identity, dynamic groups, and security compliance.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>Microsoft Intune</span><span class="text-gray-300">3/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk"></div><div class="skill-chunk"></div></div>
+                        <p class="text-sm text-gray-300">Autopilot logistics master. Registry tweaks passed to security.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>Modern Workplace</span><span class="text-gray-300">4/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk"></div></div>
+                        <p class="text-sm text-gray-300">Exchange Online tracing, SharePoint, and Exclaimer Cloud routing.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>Hybrid Infra & Azure</span><span class="text-sonic-red">3/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-red"></div><div class="skill-chunk filled-red"></div><div class="skill-chunk filled-red"></div><div class="skill-chunk"></div><div class="skill-chunk"></div></div>
+                        <p class="text-sm text-gray-300">GPO and DNS expert. Azure compute and Terraform delegated.</p>
+                    </div>
+                </div>
+
+                <!-- Systems & Data -->
+                <div>
+                    <h3 class="arcade-title text-sm text-white mb-6 bg-sonic-blue inline-block px-2 py-1">SYSTEMS & DATA</h3>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>Data & Automation</span><span class="text-gray-300">4/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk"></div></div>
+                        <p class="text-sm text-gray-300">Power BI design, SAP Business Objects, and workflow logic.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>ITSM & Workflows</span><span class="text-gray-300">4/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk"></div></div>
+                        <p class="text-sm text-gray-300">BMC Remedy, SMAX, and Jira Kanban utilisation.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>Security & Access</span><span class="text-gray-300">4/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk filled-green"></div><div class="skill-chunk"></div></div>
+                        <p class="text-sm text-gray-300">LogMeIn SSO expert. Defender policies delegated.</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-1"><span>PowerShell Scripting</span><span class="text-sonic-red">2/5</span></div>
+                        <div class="skill-track mb-2"><div class="skill-chunk filled-red"></div><div class="skill-chunk filled-red"></div><div class="skill-chunk"></div><div class="skill-chunk"></div><div class="skill-chunk"></div></div>
+                        <p class="text-sm text-gray-300">Able to read and tweak. Cannot script from scratch.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ZONE 4: Career History -->
+        <section class="retro-panel" id="panel-zone4">
+            <div class="pixel-curtain" id="curtain-zone4">
+                <div class="pixel-grid" data-zone="zone4"></div>
+                <button class="unlock-btn" onclick="flashDissolve('zone4')">[ PRESS START // UNLOCK ZONE 4 ]</button>
+            </div>
+            <h2 class="level-header">ZONE 4: CAREER TIMELINE</h2>
+            
+            <div class="space-y-10">
+                <!-- Redcentric -->
+                <div>
+                    <h3 class="arcade-title text-sm text-ring-gold bg-black mb-4">REDCENTRIC | YORK, UK</h3>
+                    
+                    <div class="mb-6 border-l-4 border-sonic-blue pl-6 ml-2">
+                        <h4 class="text-white font-bold text-xl mb-1">IT Support Manager</h4>
+                        <p class="text-sonic-blue mb-2 text-sm">Jan 2023 to Present</p>
+                        <ul class="space-y-2 text-gray-200">
+                            <li class="list-arrow">Leading a team of 12 service desk analysts and 2 second-line engineers, ensuring robust SLA adherence across a demanding enterprise environment.</li>
+                            <li class="list-arrow">Taking ownership of daily IT service stability, ensuring backups, patching and general system health are running optimally.</li>
+                            <li class="list-arrow">Building automations to clean up technical debt and handle housekeeping across users and devices.</li>
+                            <li class="list-arrow">Directing the engineering team, prioritising the workload and taking charge of major incident resolution.</li>
+                        </ul>
+                    </div>
+
+                    <div class="border-l-4 border-sonic-blue pl-6 ml-2">
+                        <h4 class="text-white font-bold text-xl mb-1">Service Desk Team Lead</h4>
+                        <p class="text-sonic-blue mb-2 text-sm">Oct 2021 to Jan 2023</p>
+                        <ul class="space-y-2 text-gray-200">
+                            <li class="list-arrow">Navigated the team through the acquisition of Piksel into Redcentric, keeping productivity high despite staff concerns.</li>
+                            <li class="list-arrow">Stepped up as the main point of contact for massive service outages.</li>
+                            <li class="list-arrow">Mentored 1st line analysts to become capable 2nd line engineers, drastically improving first contact resolution rates.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Piksel Group -->
+                <div>
+                    <h3 class="arcade-title text-sm text-ring-gold bg-black mb-4">PIKSEL GROUP | YORK, UK</h3>
+                    
+                    <div class="mb-6 border-l-4 border-sonic-blue pl-6 ml-2">
+                        <h4 class="text-white font-bold text-xl mb-1">Service Desk Team Lead</h4>
+                        <p class="text-sonic-blue mb-2 text-sm">Aug 2021 to Oct 2021</p>
+                        <ul class="space-y-2 text-gray-200">
+                            <li class="list-arrow">Brought international IT operations into alignment, covering infrastructure and support across France, Italy, Spain, and the US.</li>
+                            <li class="list-arrow">Sorted out the workflow between the different support tiers, setting up solid SLAs to stop the blame culture.</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6 border-l-4 border-sonic-blue pl-6 ml-2">
+                        <h4 class="text-white font-bold text-xl mb-1">2nd Line Engineer</h4>
+                        <p class="text-sonic-blue mb-2 text-sm">Jan 2019 to Aug 2021</p>
+                        <ul class="space-y-2 text-gray-200">
+                            <li class="list-arrow">Created custom Power BI dashboards to monitor agent KPIs and spot where training was needed.</li>
+                            <li class="list-arrow">Set up a proper centralised knowledge base so the team stopped relying on tribal knowledge.</li>
+                        </ul>
+                    </div>
+
+                    <div class="border-l-4 border-sonic-blue pl-6 ml-2">
+                        <h4 class="text-white font-bold text-xl mb-1">Early Service Desk Roles</h4>
+                        <p class="text-sonic-blue mb-2 text-sm">Aug 2013 to Jan 2019</p>
+                        <ul class="space-y-2 text-gray-200">
+                            <li class="list-arrow">Worked up the ranks from Analyst to Senior Analyst, implementing buddy systems for new starters and streamlining administrative workflows.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Early Career -->
+                <div>
+                    <h3 class="arcade-title text-sm text-ring-gold bg-black mb-4">EARLY CAREER</h3>
+                    <div class="border-l-4 border-gray-500 pl-6 ml-2">
+                        <ul class="space-y-3 text-gray-300">
+                            <li class="list-arrow">KIT Digital | Service Desk Analyst (Apr 2013 to Aug 2013)</li>
+                            <li class="list-arrow">Self Employed | Freelance Graphic Designer (Feb 2011 to Apr 2013)</li>
+                            <li class="list-arrow">Involve Learning Centre | Support Worker (Apr 2010 to Feb 2011)</li>
+                            <li class="list-arrow">GE Capital | Operations Support Officer (Oct 2008 to Jan 2010)</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SPECIAL STAGE: Certifications -->
+        <section class="retro-panel mb-24" id="panel-zone5">
+            <div class="pixel-curtain" id="curtain-zone5">
+                <div class="pixel-grid" data-zone="zone5"></div>
+                <button class="unlock-btn" onclick="flashDissolve('zone5')">[ PRESS START // UNLOCK SPECIAL STAGE ]</button>
+            </div>
+            <h2 class="level-header text-center">SPECIAL STAGE: CERTIFICATIONS</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-gray-100">
+                <div class="flex items-start gap-2">
+                    <span class="text-ring-gold mt-1">★</span> 
+                    <span>ITIL Foundation Certificate (Piksel Ltd, 2014)</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-ring-gold mt-1">★</span> 
+                    <span>Level 3 Advanced Diploma for IT Professionals (City & Guilds, 2008)</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-ring-gold mt-1">★</span> 
+                    <span>Level 3 NVQ for IT Professionals (2008)</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-ring-gold mt-1">★</span> 
+                    <span>Microsoft Certified Professional (MCP) (2008)</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-ring-gold mt-1">★</span> 
+                    <span>Microsoft Certified Desktop Support Technician (MCDST) (2008)</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-ring-gold mt-1">★</span> 
+                    <span>CompTIA A+ Certified Professional (2008)</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-ring-gold mt-1">★</span> 
+                    <span>Edexcel GNVQ Intermediate ICT (Leeds College of Technology, 2007)</span>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.pixel-grid').forEach(grid => {
+                const panel = grid.closest('.retro-panel');
+                const cols = Math.ceil(panel.offsetWidth / 24);
+                const rows = Math.ceil(panel.offsetHeight / 24);
+
+                for (let i = 0; i < cols * rows; i++) {
+                    const block = document.createElement('div');
+                    block.className = 'pixel-block';
+                    grid.appendChild(block);
+                }
+            });
+        });
+
+        function flashDissolve(zoneId) {
+            const curtain = document.getElementById('curtain-' + zoneId);
+            const blocks = curtain.querySelectorAll('.pixel-block');
+            
+            curtain.querySelector('.unlock-btn').style.display = 'none';
+
+            blocks.forEach((block) => {
+                const flashInterval = Math.random() * 1800 + 180;
+
+                setTimeout(() => {
+                    block.style.backgroundColor = 'transparent';
+                    block.style.border = 'none';
+                }, flashInterval);
+            });
+
+            setTimeout(() => {
+                curtain.style.display = 'none';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
