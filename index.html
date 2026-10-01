@@ -8,11 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #0000d8;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-            background-size: 32px 32px;
+            background-color: #05010d;
             font-family: 'VT323', monospace;
             color: #ffffff;
             margin: 0;
@@ -20,6 +16,108 @@
             line-height: 1.4;
             overflow-x: hidden;
             text-shadow: 0 0 4px rgba(255, 255, 255, 0.6), 0 0 10px rgba(80, 144, 255, 0.4);
+        }
+
+        /* --- 16-BIT PARALLAX LANDSCAPE --- */
+        .parallax-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .sky-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, #000020 0%, #2a0845 50%, #6441a5 100%);
+        }
+
+        .starfield {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 80px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 150px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 290px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 330px 180px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 460px 120px, #ffffff, rgba(0,0,0,0));
+            background-size: 500px 300px;
+            animation: twinkle 4s infinite alternate;
+        }
+
+        .retro-moon {
+            position: absolute;
+            top: 15%;
+            right: 15%;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(to bottom, #ffdb58 0%, #ff8c00 100%);
+            border-radius: 50%;
+            box-shadow: 
+                inset -15px -15px 0 rgba(0,0,0,0.2),
+                0 0 20px #ffdb58,
+                0 0 60px #ff8c00;
+        }
+
+        .mountains-back {
+            position: absolute;
+            bottom: 12vh;
+            width: 100vw;
+            height: 250px;
+            background:
+                linear-gradient(45deg, #180a33 50%, transparent 50%),
+                linear-gradient(-45deg, #180a33 50%, transparent 50%);
+            background-size: 200px 200px;
+            background-position: 0 0, 100px 0;
+            background-repeat: repeat-x;
+            animation: scrollMountainsBack 40s linear infinite;
+        }
+
+        .mountains-front {
+            position: absolute;
+            bottom: 8vh;
+            width: 100vw;
+            height: 150px;
+            background:
+                linear-gradient(45deg, #0b021a 50%, transparent 50%),
+                linear-gradient(-45deg, #0b021a 50%, transparent 50%);
+            background-size: 120px 120px;
+            background-position: 0 0, 60px 0;
+            background-repeat: repeat-x;
+            animation: scrollMountainsFront 20s linear infinite;
+        }
+
+        .ground-grid {
+            position: absolute;
+            bottom: 0;
+            width: 100vw;
+            height: 15vh;
+            background-color: #0b021a;
+            border-top: 4px solid #00f0ff;
+            background-image: 
+                linear-gradient(90deg, #0050aa 2px, transparent 2px),
+                linear-gradient(0deg, #0050aa 2px, transparent 2px);
+            background-size: 60px 20px;
+            animation: scrollGround 2s linear infinite;
+            box-shadow: 0 -10px 30px rgba(0, 240, 255, 0.3);
+        }
+
+        @keyframes scrollMountainsBack {
+            from { background-position-x: 0px, 100px; }
+            to { background-position-x: -200px, -100px; }
+        }
+        @keyframes scrollMountainsFront {
+            from { background-position-x: 0px, 60px; }
+            to { background-position-x: -120px, -60px; }
+        }
+        @keyframes scrollGround {
+            from { background-position-x: 0px, 0px; }
+            to { background-position-x: -60px, 0px; }
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
         }
 
         /* --- CRT BRIGHT PHOSPHOR & STRIPE EFFECTS --- */
@@ -141,7 +239,7 @@
         .pixel-grid {
             position: absolute;
             inset: 0;
-            display: grid; /* Changed to CSS Grid to force perfect edge snapping */
+            display: grid; 
             pointer-events: none;
         }
 
@@ -181,6 +279,16 @@
 </head>
 <body class="p-0">
 
+    <!-- 16-Bit Parallax Background -->
+    <div class="parallax-bg">
+        <div class="sky-gradient"></div>
+        <div class="starfield"></div>
+        <div class="retro-moon"></div>
+        <div class="mountains-back"></div>
+        <div class="mountains-front"></div>
+        <div class="ground-grid"></div>
+    </div>
+
     <!-- CRT Bright Overlays -->
     <div class="crt-overlay"></div>
     <div class="crt-flicker"></div>
@@ -188,6 +296,7 @@
     <!-- Top HUD / Menu -->
     <div class="top-hud">
         <div class="arcade-title text-sm tracking-widest text-white hidden md:block">SCORE: 198500</div>
+        <div class="arcade-title text-sm tracking-widest text-ring-gold">TARGET: IT Ops Manager</div>
         <div class="arcade-title text-sm tracking-widest text-white hidden md:block">TIME: 13:00</div>
     </div>
 
